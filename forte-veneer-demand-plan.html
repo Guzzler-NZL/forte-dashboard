@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Forté — Veneer Demand Plan 2026</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #f5f3ef;
+    --surface: #ffffff;
+    --surface2: #f0ede8;
+    --border: #e0dbd3;
+    --border2: #ccc7be;
+    --text: #1a1714;
+    --text2: #6b6560;
+    --text3: #9e9890;
+    --accent: #2a2420;
+    --spec: #3266ad;
+    --trade: #1D9E75;
+    --show: #BA7517;
+    --danger: #c0392b;
+    --radius: 8px;
+    --radius-lg: 12px;
+  }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    font-size: 14px;
+    line-height: 1.5;
+  }
+
+  /* Header */
+  .header {
+    background: var(--accent);
+    color: #fff;
+    padding: 0 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 56px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .header-logo { font-size: 15px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; }
+  .header-sub { font-size: 11px; color: rgba(255,255,255,0.5); letter-spacing: 0.06em; text-transform: uppercase; }
+  .header-right { display: flex; align-items: center; gap: 12px; }
+
+  /* Layout */
+  .page { max-width: 1100px; margin: 0 auto; padding: 2rem 1.5rem 4rem; }
+
+  /* Controls bar */
+  .controls-bar {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+  }
+  .controls-bar label { font-size: 12px; color: var(--text2); font-weight: 500; letter-spacing: 0.04em; text-transform: uppercase; }
+  .controls-bar select {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    padding: 7px 12px;
+    border: 1px solid var(--border2);
+    border-radius: var(--radius);
+    background: var(--surface);
+    color: var(--text);
+    cursor: pointer;
+    outline: none;
+  }
+  .controls-bar select:focus { border-color: var(--accent); }
+  .period-badge {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    padding: 4px 10px;
+    border-radius: 20px;
+    background: var(--accent);
+    color: #fff;
+    letter-spacing: 0.04em;
+  }
+
+  .summary-grid {
+    display: grid;
+    grid-template-columns: repeat(6, minmax(0,1fr));
+    gap: 10px;
+    margin-bottom: 1.5rem;
+  }
+  .s-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 14px 16px;
+  }
+  .s-card .sc-label { font-size: 10px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text3); margin-bottom: 6px; }
+  .s-card .sc-val { font-size: 22px; font-weight: 300; color: var(--text); font-family: 'DM Mono', monospace; }
+  .s-card .sc-sub { font-size: 11px; color: var(--text3); margin-top: 3px; }
+
+  /* Section header */
+  .section-head {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 12px;
+    margin-top: 2rem;
+  }
+  .section-head h2 { font-size: 11px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text2); }
+  .section-head .sh-line { flex: 1; height: 1px; background: var(--border); }
+
+  /* Team block */
+  .team-block { margin-bottom: 1rem; }
+  .team-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    cursor: pointer;
+    user-select: none;
+    transition: background 0.15s;
+  }
+  .team-header:hover { background: var(--surface2); }
+  .team-header.open { border-bottom-left-radius: 0; border-bottom-right-radius: 0; border-bottom-color: transparent; }
+  .team-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+  .team-name { font-size: 13px; font-weight: 500; flex: 1; }
+  .team-lead { font-size: 12px; color: var(--text2); font-weight: 400; }
+  .team-count { font-family: 'DM Mono', monospace; font-size: 12px; color: var(--text2); }
+  .team-chevron { font-size: 10px; color: var(--text3); transition: transform 0.2s; }
+  .team-header.open .team-chevron { transform: rotate(180deg); }
+
+  .team-body {
+    display: none;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-top: none;
+    border-bottom-left-radius: var(--radius-lg);
+    border-bottom-right-radius: var(--radius-lg);
+    padding: 16px;
+  }
+  .team-body.open { display: block; }
+
+  /* Rep card */
+  .rep-card {
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 14px;
+    margin-bottom: 10px;
+    background: var(--bg);
+  }
+  .rep-card:last-of-type { margin-bottom: 0; }
+  .rep-top {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 14px;
+  }
+  .rep-avatar {
+    width: 30px; height: 30px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 500; flex-shrink: 0;
+  }
+  .rep-name-text { font-size: 13px; font-weight: 500; flex: 1; display: flex; align-items: center; gap: 7px; }
+  .lead-badge { font-size: 10px; font-weight: 500; letter-spacing: 0.06em; text-transform: uppercase; padding: 2px 7px; border-radius: 20px; background: var(--surface2); color: var(--text2); border: 1px solid var(--border); }
+  .rep-panels-row { display: flex; align-items: center; gap: 8px; margin-left: auto; }
+  .rep-panels-row label { font-size: 11px; color: var(--text2); text-transform: uppercase; letter-spacing: 0.06em; }
+  .rep-panels-row input[type="number"] {
+    width: 76px;
+    font-family: 'DM Mono', monospace;
+    font-size: 13px;
+    padding: 6px 10px;
+    border: 1px solid var(--border2);
+    border-radius: var(--radius);
+    background: var(--surface);
+    color: var(--text);
+    outline: none;
+  }
+  .rep-panels-row input[type="number"]:focus { border-color: var(--accent); }
+
+  .rep-sliders { display: grid; grid-template-columns: 1fr 1fr; gap: 0 2.5rem; }
+  .sliders-title { font-size: 10px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text3); margin-bottom: 8px; }
+  .slider-row { display: grid; grid-template-columns: 108px 1fr 36px 44px; align-items: center; gap: 8px; margin-bottom: 7px; }
+  .slider-row label { font-size: 12px; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .slider-row input[type="range"] {
+    -webkit-appearance: none;
+    width: 100%;
+    height: 3px;
+    border-radius: 2px;
+    background: var(--border2);
+    outline: none;
+    cursor: pointer;
+  }
+  .slider-row input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 14px; height: 14px;
+    border-radius: 50%;
+    background: var(--accent);
+    cursor: pointer;
+  }
+  .slider-val { font-family: 'DM Mono', monospace; font-size: 11px; font-weight: 500; text-align: right; color: var(--text2); }
+  .slider-count { font-family: 'DM Mono', monospace; font-size: 11px; text-align: right; color: var(--text3); }
+  .warn-msg { font-size: 11px; color: var(--danger); margin: 2px 0 6px; display: none; }
+
+  .disclaimer {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--border2);
+    border-radius: var(--radius);
+    padding: 10px 14px;
+    font-size: 12px;
+    color: var(--text2);
+    margin-bottom: 1.5rem;
+  }
+  .pct-bar-wrap { display: flex; align-items: center; gap: 6px; }
+  .pct-bar { height: 6px; border-radius: 3px; min-width: 2px; }
+  .rollup-wrap { margin-top: 14px; overflow-x: auto; }
+  .rollup-wrap table { width: 100%; border-collapse: collapse; font-size: 12px; }
+  .rollup-wrap thead th {
+    font-size: 10px; font-weight: 500; letter-spacing: 0.06em; text-transform: uppercase;
+    color: var(--text3); padding: 5px 8px; border-bottom: 1px solid var(--border); text-align: left;
+  }
+  .rollup-wrap tbody td { padding: 6px 8px; border-bottom: 1px solid var(--border); color: var(--text); }
+  .rollup-wrap tbody tr:last-child td { border-bottom: none; }
+  .rollup-wrap .tot-row td { font-weight: 500; background: var(--surface2); }
+
+  /* SKU matrix */
+  .sku-wrap { overflow-x: auto; margin-top: 0.5rem; }
+  .sku-wrap table { width: 100%; border-collapse: collapse; font-size: 12px; }
+  .sku-wrap thead th {
+    font-size: 10px; font-weight: 500; letter-spacing: 0.06em; text-transform: uppercase;
+    color: var(--text3); padding: 6px 10px; border-bottom: 1px solid var(--border);
+    text-align: left; background: var(--surface);
+  }
+  .sku-wrap tbody td { padding: 7px 10px; border-bottom: 1px solid var(--border); background: var(--surface); color: var(--text); }
+  .sku-wrap tbody tr:last-child td { border-bottom: none; }
+  .sku-wrap .tot-row td { font-weight: 500; background: var(--surface2); }
+  .tag {
+    display: inline-block; font-size: 11px; padding: 2px 8px;
+    border-radius: 20px; font-weight: 500;
+  }
+
+  /* Submit bar */
+  .submit-bar {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-top: 2rem;
+    flex-wrap: wrap;
+  }
+  .submit-note { font-size: 12px; color: var(--text3); }
+
+  /* Responsive */
+  @media (max-width: 700px) {
+    .summary-grid { grid-template-columns: repeat(2, minmax(0,1fr)); }
+    .rep-sliders { grid-template-columns: 1fr; }
+    .slider-row { grid-template-columns: 90px 1fr 32px 36px; }
+  }
+  @media (max-width: 480px) {
+    .summary-grid { grid-template-columns: 1fr 1fr; }
+    .header { padding: 0 1rem; }
+    .page { padding: 1rem 1rem 3rem; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div>
+    <div class="header-logo">Forté</div>
+  </div>
+  <div class="header-sub">Veneer Demand Plan 2026</div>
+  <div class="header-right">
+    <span id="headerPeriod" style="font-size:12px;color:rgba(255,255,255,0.6)"></span>
+  </div>
+</div>
+
+<div class="page">
+
+  <div class="controls-bar">
+    <label>Forecast period</label>
+    <span class="period-badge" id="periodBadge">Apr – Dec 2026</span>
+    <span style="font-size:12px;color:var(--text3);margin-left:auto">Each rep enters panels + colour and size mix below</span>
+  </div>
+
+  <div class="disclaimer">Note: this forecast covers standard stocked panel sizes only. Custom projects and non-standard sizes are not included.</div>
+
+  <div class="summary-grid" id="summaryCards"></div>
+
+  <div class="section-head"><h2>Teams</h2><div class="sh-line"></div></div>
+  <div id="teamsContainer"></div>
+
+  <div class="section-head"><h2>SKU matrix — all teams combined</h2><div class="sh-line"></div></div>
+  <div class="sku-wrap"><table id="skuTable"></table></div>
+
+  <div style="margin-top:1.5rem;font-size:11px;color:var(--text3);text-align:center">
+    Forté — Veneer Demand Plan 2026 &nbsp;·&nbsp; Internal use only
+  </div>
+
+</div>
+
+<script>
+const AVG_PANEL_PRICE = 600;
+
+const FORECAST_PERIOD = 'Apr – Dec 2026';
+
+const teams = [
+  { id: 'spec', name: 'Specification', lead: 'Felix Piesse', color: '#3266ad',
+    reps: [{id:'felix',name:'Felix Piesse',isLead:true},{id:'diana',name:'Diana'},{id:'katrina',name:'Katrina'},{id:'gideon',name:'Gideon'}] },
+  { id: 'trade', name: 'Trade', lead: 'Jamie Watt', color: '#1D9E75',
+    reps: [{id:'jamie',name:'Jamie Watt',isLead:true},{id:'martin',name:'Martin'},{id:'johnny',name:'Johnny'},{id:'brad',name:'Brad'},{id:'alice',name:'Alice'}] },
+  { id: 'showroom', name: 'Showroom', lead: 'Danielle Quick', color: '#BA7517',
+    reps: [{id:'danielle',name:'Danielle Quick',isLead:true},{id:'larissa',name:'Larissa'},{id:'courtney',name:'Courtney'},{id:'barb',name:'Barb'}] },
+];
+
+const sizes = [
+  { id: 's0', label: '3050 × 1220', sqm: +(3.050*1.220).toFixed(3) },
+  { id: 's1', label: '2440 × 1220', sqm: +(2.440*1.220).toFixed(3) },
+];
+
+const colours = ['Asta','Cove','Ember Walnut','Inca','Nox','Ochre','Solis','Tusk'];
+const CPALS = ['#3266ad','#1D9E75','#BA7517','#993C1D','#534AB7','#0F6E56','#D85A30','#3C3489'];
+
+const repData = {};
+
+function initRep(rid) {
+  if (repData[rid]) return;
+  const eS = Math.floor(100 / sizes.length);
+  const eC = Math.floor(100 / colours.length);
+  repData[rid] = {
+    panels: 0,
+    sizes: sizes.map((s, i) => ({ val: i < sizes.length - 1 ? eS : 100 - eS * (sizes.length - 1) })),
+    colours: colours.map((c, i) => ({ val: i < colours.length - 1 ? eC : 100 - eC * (colours.length - 1) })),
+  };
+}
+
+function initials(name) { return name.split(' ').map(w => w[0]).join('').toUpperCase().slice(0,2); }
+function fmt(n) { return Math.round(n).toLocaleString(); }
+function fmtD(n, d) { return (+n).toFixed(d); }
+function getSum(arr) { return arr.reduce((s, i) => s + i.val, 0); }
+
+
+function buildTeams() {
+  const c = document.getElementById('teamsContainer');
+  c.innerHTML = '';
+  teams.forEach(team => {
+    team.reps.forEach(r => initRep(r.id));
+    const block = document.createElement('div');
+    block.className = 'team-block';
+    block.innerHTML = `
+      <div class="team-header open" id="th_${team.id}" onclick="toggleTeam('${team.id}')">
+        <div class="team-dot" style="background:${team.color}"></div>
+        <span class="team-name">${team.name}</span>
+        <span class="team-count" id="tt_${team.id}">0 panels</span>
+        <span class="team-chevron">▼</span>
+      </div>
+      <div class="team-body open" id="tb_${team.id}">
+        ${team.reps.map(r => buildRepCard(r, team.color)).join('')}
+        <div id="tr_${team.id}"></div>
+      </div>`;
+    c.appendChild(block);
+  });
+}
+
+function buildRepCard(rep, color) {
+  const d = repData[rep.id];
+  const sizeSliders = sizes.map((s, i) => `
+    <div class="slider-row">
+      <label>${s.label}</label>
+      <input type="range" id="${rep.id}_s${i}" min="0" max="100" step="1" value="${d.sizes[i].val}"
+        oninput="updateSlider('${rep.id}','s',${i},this.value)">
+      <span class="slider-val" id="${rep.id}_s${i}v">${d.sizes[i].val}%</span>
+      <span class="slider-count" id="${rep.id}_s${i}n">0</span>
+    </div>`).join('');
+  const colSliders = colours.map((cl, i) => `
+    <div class="slider-row">
+      <label style="color:${CPALS[i]};font-weight:500">${cl}</label>
+      <input type="range" id="${rep.id}_c${i}" min="0" max="100" step="1" value="${d.colours[i].val}"
+        oninput="updateSlider('${rep.id}','c',${i},this.value)">
+      <span class="slider-val" id="${rep.id}_c${i}v">${d.colours[i].val}%</span>
+      <span class="slider-count" id="${rep.id}_c${i}n">0</span>
+    </div>`).join('');
+  return `<div class="rep-card" id="rc_${rep.id}">
+    <div class="rep-top">
+      <div class="rep-avatar" style="background:${color}20;color:${color}">${initials(rep.name)}</div>
+      <span class="rep-name-text">${rep.name}${rep.isLead ? '<span class="lead-badge">Team lead</span>' : ''}</span>
+      <div class="rep-panels-row">
+        <label>Panels</label>
+        <input type="number" id="${rep.id}_panels" value="0" min="0" step="1"
+          oninput="updatePanels('${rep.id}',this.value)">
+      </div>
+    </div>
+    <div class="rep-sliders">
+      <div>
+        <div class="sliders-title">Size mix</div>
+        ${sizeSliders}
+      </div>
+      <div>
+        <div class="sliders-title">Colour mix</div>
+        ${colSliders}
+      </div>
+    </div>
+  </div>`;
+}
+
+function toggleTeam(tid) {
+  document.getElementById('th_'+tid).classList.toggle('open');
+  document.getElementById('tb_'+tid).classList.toggle('open');
+}
+
+function normalise(arr, changedIdx, newVal) {
+  const n = arr.length;
+  arr[changedIdx].val = newVal;
+  const remaining = 100 - newVal;
+  const others = arr.filter((_, i) => i !== changedIdx);
+  const othersSum = others.reduce((s, o) => s + o.val, 0);
+  if (othersSum === 0) {
+    const share = Math.floor(remaining / others.length);
+    const leftover = remaining - share * others.length;
+    others.forEach((o, i) => { o.val = share + (i === 0 ? leftover : 0); });
+  } else {
+    let distributed = 0;
+    others.forEach((o, i) => {
+      if (i < others.length - 1) {
+        o.val = Math.round((o.val / othersSum) * remaining);
+        distributed += o.val;
+      } else {
+        o.val = remaining - distributed;
+      }
+    });
+  }
+  arr.forEach(o => { o.val = Math.max(0, Math.min(100, o.val)); });
+}
+
+function updateSliderUI(rid, type) {
+  const arr = type === 's' ? repData[rid].sizes : repData[rid].colours;
+  const panels = repData[rid].panels;
+  const total = arr.reduce((s,o) => s+o.val, 0) || 1;
+  arr.forEach((o, i) => {
+    const pfx = type === 's' ? `${rid}_s${i}` : `${rid}_c${i}`;
+    const el = document.getElementById(pfx);
+    const vEl = document.getElementById(pfx+'v');
+    const nEl = document.getElementById(pfx+'n');
+    if (el) el.value = o.val;
+    if (vEl) vEl.textContent = o.val + '%';
+    if (nEl) nEl.textContent = Math.round(panels * o.val / total);
+  });
+}
+
+function updateSlider(rid, type, idx, val) {
+  const arr = type === 's' ? repData[rid].sizes : repData[rid].colours;
+  normalise(arr, idx, +val);
+  updateSliderUI(rid, type);
+  render();
+}
+
+function updatePanelCounts(rid) {
+  updateSliderUI(rid, 's');
+  updateSliderUI(rid, 'c');
+}
+
+function updatePanels(rid, val) {
+  repData[rid].panels = +val || 0;
+  updatePanelCounts(rid);
+  render();
+}
+
+function getRepMatrix(rid) {
+  const d = repData[rid];
+  const sSum = getSum(d.sizes); const cSum = getSum(d.colours);
+  const m = {};
+  colours.forEach((_, ci) => sizes.forEach((_, si) => {
+    const cP = cSum > 0 ? d.colours[ci].val / cSum : 0;
+    const sP = sSum > 0 ? d.sizes[si].val / sSum : 0;
+    m[`${ci}_${si}`] = (m[`${ci}_${si}`] || 0) + d.panels * cP * sP;
+  }));
+  return m;
+}
+
+function render() {
+  let grandTotal = 0;
+  const masterMatrix = {};
+  colours.forEach((_, ci) => sizes.forEach((_, si) => { masterMatrix[`${ci}_${si}`] = 0; }));
+
+  teams.forEach(team => {
+    let teamTotal = 0;
+    team.reps.forEach(r => {
+      teamTotal += repData[r.id].panels;
+      const m = getRepMatrix(r.id);
+      Object.keys(m).forEach(k => { masterMatrix[k] = (masterMatrix[k] || 0) + m[k]; });
+    });
+    grandTotal += teamTotal;
+    document.getElementById('tt_'+team.id).textContent = fmt(teamTotal) + ' panels';
+
+    // team rollup
+    const trEl = document.getElementById('tr_'+team.id);
+    if (teamTotal === 0) { trEl.innerHTML = ''; return; }
+    let html = `<div class="rollup-wrap"><table><thead><tr><th>Rep</th><th>Panels</th>`;
+    sizes.forEach(s => { html += `<th>${s.label}</th>`; });
+    colours.forEach((cl, i) => { html += `<th style="color:${CPALS[i]}">${cl.slice(0,4)}</th>`; });
+    html += `</tr></thead><tbody>`;
+    team.reps.forEach(r => {
+      const d = repData[r.id];
+      const sSum = getSum(d.sizes); const cSum = getSum(d.colours);
+      html += `<tr><td>${r.name}</td><td>${fmt(d.panels)}</td>`;
+      sizes.forEach((_, si) => { html += `<td>${fmt(d.panels * (sSum > 0 ? d.sizes[si].val / sSum : 0))}</td>`; });
+      colours.forEach((_, ci) => { html += `<td>${fmt(d.panels * (cSum > 0 ? d.colours[ci].val / cSum : 0))}</td>`; });
+      html += `</tr>`;
+    });
+    const tSizes = sizes.map((_, si) => Math.round(team.reps.reduce((s, r) => {
+      const d = repData[r.id]; const ss = getSum(d.sizes);
+      return s + d.panels * (ss > 0 ? d.sizes[si].val / ss : 0);
+    }, 0)));
+    const tCols = colours.map((_, ci) => Math.round(team.reps.reduce((s, r) => {
+      const d = repData[r.id]; const cs = getSum(d.colours);
+      return s + d.panels * (cs > 0 ? d.colours[ci].val / cs : 0);
+    }, 0)));
+    html += `<tr class="tot-row"><td>${team.name} total</td><td>${fmt(teamTotal)}</td>`;
+    tSizes.forEach(p => { html += `<td>${fmt(p)}</td>`; });
+    tCols.forEach(p => { html += `<td>${fmt(p)}</td>`; });
+    html += `</tr></tbody></table></div>`;
+    trEl.innerHTML = html;
+  });
+
+  let grandSqm = 0;
+  colours.forEach((_, ci) => sizes.forEach((s, si) => { grandSqm += masterMatrix[`${ci}_${si}`] * s.sqm; }));
+
+  const teamTotals = teams.map(t => t.reps.reduce((s, r) => s + repData[r.id].panels, 0));
+  const forecastRevenue = grandTotal * AVG_PANEL_PRICE;
+  const teamRevenues = teamTotals.map(t => t * AVG_PANEL_PRICE);
+
+  // summary cards
+  document.getElementById('summaryCards').innerHTML = `
+    <div class="s-card" style="border-top:3px solid var(--accent)">
+      <div class="sc-label">Total panels</div>
+      <div class="sc-val">${fmt(grandTotal)}</div>
+      <div class="sc-sub">Apr – Dec 2026</div>
+    </div>
+    <div class="s-card" style="border-top:3px solid var(--accent)">
+      <div class="sc-label">Forecast revenue</div>
+      <div class="sc-val">$${forecastRevenue >= 1000000 ? (forecastRevenue/1000000).toFixed(2)+'M' : (forecastRevenue/1000).toFixed(1)+'K'}</div>
+      <div class="sc-sub">@ $${fmt(AVG_PANEL_PRICE)} avg/panel</div>
+    </div>
+    ${teams.map((t, i) => `
+    <div class="s-card" style="border-top:3px solid ${t.color}">
+      <div class="sc-label">${t.name}</div>
+      <div class="sc-val" style="color:${t.color}">${fmt(teamTotals[i])}</div>
+      <div class="sc-sub">$${teamRevenues[i] >= 1000000 ? (teamRevenues[i]/1000000).toFixed(2)+'M' : (teamRevenues[i]/1000).toFixed(1)+'K'} &nbsp;·&nbsp; ${grandTotal > 0 ? ((teamTotals[i]/grandTotal)*100).toFixed(0) : 0}%</div>
+    </div>`).join('')}`;
+
+  const sku = document.getElementById('skuTable');
+  let thead = '<thead><tr><th>Colour</th>';
+  sizes.forEach(s => { thead += `<th>${s.label}</th>`; });
+  thead += '<th>Total panels</th><th>% of total</th></tr></thead>';
+  sku.innerHTML = thead;
+  const skub = document.createElement('tbody');
+  let gP = 0;
+  colours.forEach((cl, ci) => {
+    const tr = document.createElement('tr');
+    let rowP = 0;
+    let row = `<td><span class="tag" style="background:${CPALS[ci]}18;color:${CPALS[ci]}">${cl}</span></td>`;
+    sizes.forEach((s, si) => {
+      const p = Math.round(masterMatrix[`${ci}_${si}`]);
+      rowP += p;
+      row += `<td>${fmt(p)}</td>`;
+    });
+    const pct = grandTotal > 0 ? (rowP / grandTotal * 100) : 0;
+    const barW = Math.round(pct);
+    row += `<td style="font-weight:500">${fmt(rowP)}</td>`;
+    row += `<td><div class="pct-bar-wrap"><div class="pct-bar" style="width:${Math.max(barW,2)}px;background:${CPALS[ci]}60"></div><span style="font-family:'DM Mono',monospace;font-size:11px;color:var(--text2)">${pct.toFixed(1)}%</span></div></td>`;
+    gP += rowP;
+    tr.innerHTML = row; skub.appendChild(tr);
+  });
+  const totRow = document.createElement('tr'); totRow.className = 'tot-row';
+  let totH = '<td>Total</td>';
+  sizes.forEach((_, si) => {
+    const p = Math.round(colours.reduce((_, __, ci) => _ + masterMatrix[`${ci}_${si}`], 0));
+    totH += `<td>${fmt(p)}</td>`;
+  });
+  totH += `<td>${fmt(gP)}</td><td>100%</td>`;
+  totRow.innerHTML = totH; skub.appendChild(totRow);
+  sku.appendChild(skub);
+}
+
+// Init
+document.getElementById('headerPeriod').textContent = FORECAST_PERIOD;
+buildTeams();
+render();
+</script>
+</body>
+</html>
